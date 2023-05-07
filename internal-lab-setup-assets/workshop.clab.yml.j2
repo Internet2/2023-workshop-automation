@@ -1,0 +1,54 @@
+{%- set id = id|default(1) %}
+{%- macro shared_node_settings(x) %}
+      mgmt_ipv4: 172.16.{{id}}.{{x}}
+      mgmt_ipv6: 2001:db8:16:{{id}}::{{x}}
+      ports:
+        - 2{{"%02d" % id}}{{x}}:22
+{%- endmacro -%}
+name: automation-workshop-{{"%02d" % id}}
+
+mgmt:
+  network: automation-workshop-{{"%02d" % id}}
+  ipv4_subnet: 172.16.{{id}}.0/24
+  ipv6_subnet: 2001:db8:16:{{id}}::/80
+
+topology:
+  kinds:
+    cisco_xrd:
+      image: ios-xr/xrd-control-plane:7.9.1
+    juniper_crpd:
+      image: crpd:23.1R1.8
+      license: license.txt
+      startup-config: startup-config/juniper1.conf
+      exec:
+        - cli request system license add tmp/junos_sfnt_tmp.lic
+
+  nodes:
+    {%- set x = 2 %}
+    cisco1:
+      kind: cisco_xrd
+      startup-config: startup-config/cisco1.conf
+      {{- shared_node_settings(x) }}
+    {%- set x = x+1 %}
+    cisco2:
+      kind: cisco_xrd
+      startup-config: startup-config/cisco2.conf
+      {{- shared_node_settings(x) }}
+    {%- set x = x+1 %}
+    juniper1:
+      kind: juniper_crpd
+      {{- shared_node_settings(x) }}
+    {%- set x = x+1 %}
+    ubuntu:
+      kind: linux
+      image: internet2/getting_started
+      {{- shared_node_settings(x) }}
+      env:
+        CX23_LAB_PASSWORD: Self-Nose-Reasonable-Dust-{{"%02d" % id}}
+
+  links:
+    - endpoints: ["cisco1:Gi0-0-0-0", "cisco2:Gi0-0-0-0"]
+    - endpoints: ["cisco1:Gi0-0-0-1", "juniper1:eth1"]
+    - endpoints: ["cisco2:Gi0-0-0-1", "juniper1:eth2"]
+    - endpoints: ["ubuntu:eth1", "cisco1:Gi0-0-0-2"]
+    - endpoints: ["ubuntu:eth2", "cisco2:Gi0-0-0-2"]

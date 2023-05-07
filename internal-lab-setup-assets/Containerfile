@@ -11,10 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     traceroute \
     pip \
+    make \
     vim nano emacs
 
 # Create user account "lab" for workshop participant
-RUN adduser --gecos "" lab && usermod -aG sudo lab
+RUN adduser --gecos "" clab && usermod -aG sudo clab
 
 # Extend PATH so all our new packages run easier
 RUN export PATH=$PATH:/sbin:/usr/sbin
@@ -35,6 +36,7 @@ EXPOSE 22
 
 # Prepare post-init script.
 COPY ./workshop-init.sh /workshop-init.sh
+COPY ./lab-makefile-for-bug /Makefile
 RUN chmod +x /workshop-init.sh
 
 # Configure sshd as root process. If sshd terminates for some reason, the container will too.
