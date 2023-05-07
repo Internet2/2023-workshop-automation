@@ -33,7 +33,7 @@
         var: command
 
     - name: set interfaces IOSXR
-      cisco.ios.ios_interfaces:
+      cisco.iosxr.iosxr_interfaces:
         config: "{{ command }}"
       when: device_type == "IOSXR"
 
