@@ -1,3 +1,5 @@
+NOTE: This folder contains assets that were used to deploy the Containerlab environment that hosts 30 labs used in this workshop. It is included in this repo for any curious minds.
+
 Tune host settings https://hmntsharma.github.io/cisco-xrd/base_setup/#clone-the-xrd-tools-repository
 
 Set mgmt address in the config (instead of automatically assigning) as XRd has a bug and a container keeps its old address if it's been assigned a new address. containerlab is non-deterministic when assigning mgmt IPs.
